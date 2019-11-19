@@ -1,12 +1,13 @@
 from random import randint
-#import time
+import time
 
+TIME = 0.01
 DATAFILE = "data.txt"
 WISHFILE = "wishes.txt"
 TNIMIVAKIO = "4" #Tuotettavien tiedostojen etuliite
 
 def lue_tiedosto(data):
-	"""Lukee datan tiedostosta"""
+    """Lukee datan tiedostosta"""
 
     print("Aloitetaan tiedostosta lukeminen")
     try:
@@ -89,7 +90,7 @@ def tallenna_tiedosto(data, arvottu):
     return data
 
 def tallenna_toive_tiedosto(wishes):
-	"""Tallentaa toiveet tiedostoon"""
+    """Tallentaa toiveet tiedostoon"""
 
     print("Aloitetaan toiveiden tallentaminen tiedostoon")
 
@@ -113,7 +114,7 @@ def tallenna_toive_tiedosto(wishes):
     return
 
 def luo_tiedostot(data):
-	"""Luo arvoituista tiedoista henkilökohtaiset tiedostot"""
+    """Luo arvoituista tiedoista henkilökohtaiset tiedostot"""
 
     print("Tehdaan ykisttaiset tiedostot")
     laskin = 0
@@ -131,7 +132,7 @@ def luo_tiedostot(data):
 
 
 def syota_tietoja(data, arvottu, wishes):
-	"""Lisää uusia henkilöitä"""
+    """Lisää uusia henkilöitä"""
 
     if not arvottu:
         nimi = input("Syota henkilon nimi: ")
@@ -156,7 +157,7 @@ def syota_tietoja(data, arvottu, wishes):
     return data, arvottu, wishes
 
 def suorita_arvonta(data):
-	"""Arpoo secret santat kaikille"""
+    """Arpoo secret santat kaikille"""
 
     tallenna_tiedosto(data, False)
     lista = sorted(data)
@@ -193,7 +194,7 @@ def suorita_arvonta(data):
     return data, True
 
 def tarkista_tiedot(data, arvottu):
-	"""Tarkistaa secret santojen toimivuuden"""
+    """Tarkistaa secret santojen toimivuuden"""
 
     if not arvottu:
         print("Tietoja ei ole viela arvottu")
@@ -242,24 +243,26 @@ def tarkista_tiedot(data, arvottu):
     return
 
 def main():
-	"""Päävalikko"""
+    """Päävalikko"""
 
     data = {}
     wishes = {}
     arvottu = False
-	jatka = True
-	
+    jatka = True
+
     for i in range(0, 60):
         print()
-    teksti = "Tervetuloa secret santa arvontaohjelmaan. Alla muutama kayttoa helpottava ohje: Jos"+
-	"sinulla on jo käytössä tiedostoja kuten toive tai data, lataa se ennen kuin lisäät lietoja, "+
-	"muuten ne ylikirjoitetaan. Nimiketietoja pystyy muokkaamaan lisämmällä samannimisen henkilön"+
-	"uudestaan oikeilla tiedoilla. Poistaminen ja laajempi muokkaus kannattaa tehdä suoraan teido"+
-	"stoa muokaten. Arvontaa ennen tapahtuu automaattinen tallennus."
 
-	for i in teksti:
-        print(i, end="")
-        #time.sleep(0.1) #Ei toimi chromebookissa
+    teksti = "Tervetuloa secret santa arvontaohjelmaan. Alla muutama kayttoa helpottava ohje: Jos"+\
+    "sinulla on jo käytössä tiedostoja kuten toive tai data, lataa se ennen kuin lisäät lietoja, "+\
+    "muuten ne ylikirjoitetaan. Nimiketietoja pystyy muokkaamaan lisämmällä samannimisen henkilön"+\
+    "uudestaan oikeilla tiedoilla. Poistaminen ja laajempi muokkaus kannattaa tehdä suoraan teido"+\
+    "stoa muokaten. Arvontaa ennen tapahtuu automaattinen tallennus."
+
+    for i in range(len(teksti)):
+        print(teksti[i], end="", flush=True)
+        time.sleep(TIME) #Ei toimi chromebookissa
+    print()
 
     while jatka:
         print()
@@ -316,7 +319,7 @@ def main():
         else:
             print("Vaara arvo")
 
-	return 0
+    return 0
 
 
 main()
