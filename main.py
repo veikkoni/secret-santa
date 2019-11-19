@@ -101,7 +101,7 @@ def tallennaToiveTiedosto(wishes):
         teksti = nimi + ";" + wishes[nimi] + "\n"
         file.write(teksti)
 
-    file.close()    
+    file.close()
     print(laskuri, "toivetta tallennettu tiedostoon")
 
     return
@@ -117,7 +117,7 @@ def luoTiedostot(data):
         except:
             print("Tiedoston avaaminen epaonnistui,", laskin, "nimea tallenenttu")
             return data
-        file.write(nimi + "\nSinulle on arvottu\n" + data[nimi][0]) 
+        file.write(nimi + "\nSinulle on arvottu\n" + data[nimi][0])
         file.close()
         laskin += 1
     print(laskin, "tiedostoa tehty onnistuneesti")
@@ -128,7 +128,7 @@ def syotaTietoja(data, arvottu, wishes):
     if not arvottu:
         nimi = input("Syota henkilon nimi: ")
         wish = input("Syöta henkilon toive (Jätä tyhjäksi käyttääksesi tiedoston toivetta): ")
-        if (wish != ""):
+        if wish != "":
             wishes[nimi] = wish
         data[nimi] = [None]
         syote = " "
@@ -143,7 +143,7 @@ def syotaTietoja(data, arvottu, wishes):
         if int(input("Syote: ")) == 1:
             nimi = input("Syota henkilon nimi: ")
             data[nimi] = []
-            
+
     arvottu = False
     return data, arvottu, wishes
 
@@ -163,7 +163,7 @@ def suoritaArvonta(data):
             if ongelmat >= 30:
                 print("Arvonta epaonnistui")
                 return data, False
-            x = randint(0,len(lista)-1)
+            x = randint(0, len(lista)-1)
             arvottuNimi = lista[x]
             if arvottuNimi != nimi:
                 for kielletty in pahatNimet:
@@ -179,7 +179,7 @@ def suoritaArvonta(data):
 
     if ongelmat < 30:
         print("Arvonta suoritettu onnistuneesti")
-                    
+
     return data, True
 
 def tarkistaTiedot(data, arvottu):
@@ -228,13 +228,13 @@ def tarkistaTiedot(data, arvottu):
         print("ONGELMA: Arvotut ei tasmaa osallistujia")
 
     print("Kohdattiin", ongelmia, "ongelmaa")
-    return        
+    return
 
 def main():
     data = {}
     wishes = {}
     arvottu = False
-    for i in range(0,60):
+    for i in range(0, 60):
         print()
     teksti = "Tervetuloa secret santa arvontaohjelmaan. Alla muutama kayttoa helpottava ohje: Jos sinulla on jo käytössä tiedostoja kuten toive tai data, lataa se ennen kuin lisäät lietoja, muuten ne ylikirjoitetaan. Nimiketietoja pystyy muokkaamaan lisämmällä samannimisen henkilön uudestaan oikeilla tiedoilla. Poistaminen ja laajempi muokkaus kannattaa tehdä suoraan teidostoa muokaten. Arvontaa ennen tapahtuu automaattinen tallennus."
     for i in teksti:
@@ -244,7 +244,7 @@ def main():
     while True:
         print()
         input("Paina jatkaaksesi...")
-        for i in range(0,60):
+        for i in range(0, 60):
             print()
         print("0 Lopeta ohjelma")
         print("1 Syota tietoja")
