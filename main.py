@@ -1,3 +1,7 @@
+"""
+Secret santa arpomis sovellus
+Veikko Nieminen
+"""
 from random import randint
 import time
 
