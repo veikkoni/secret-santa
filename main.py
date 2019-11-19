@@ -5,11 +5,13 @@ DATAFILE = "data.txt"
 WISHFILE = "wishes.txt"
 TNIMIVAKIO = "4" #Tuotettavien tiedostojen etuliite
 
-def lueTiedosto(data):
+def lue_tiedosto(data):
+	"""Lukee datan tiedostosta"""
+
     print("Aloitetaan tiedostosta lukeminen")
     try:
         file = open(DATAFILE, "r")
-    except:
+    except Exception:
         print("Tiedoston lukeminen epaonnistui")
         return data, False
     next(file)
@@ -36,11 +38,13 @@ def lueTiedosto(data):
     return data, arvottu
 
 
-def lueToiveTiedosto(wishes):
+def lue_toive_tiedosto(wishes):
+    """Lukee toiveet tiedostosta"""
+
     print("Aloitetaan toiveiden lukeminen tiedostosta")
     try:
         file = open(WISHFILE, "r")
-    except:
+    except Exception:
         print("Tiedoston lukeminen epaonnistui")
         return wishes
     next(file)
@@ -57,13 +61,14 @@ def lueToiveTiedosto(wishes):
     return wishes
 
 
-def tallennaTiedosto(data, arvottu):
+def tallenna_tiedosto(data, arvottu):
+    """Talentaa datan tiedostoon"""
 
     print("Aloitetaan tiedostoon tallentaminen")
 
     try:
         file = open(DATAFILE, "w")
-    except:
+    except Exception:
         print("Tiedoston lukeminen epaonnistui")
         return data
 
@@ -83,13 +88,14 @@ def tallennaTiedosto(data, arvottu):
 
     return data
 
-def tallennaToiveTiedosto(wishes):
+def tallenna_toive_tiedosto(wishes):
+	"""Tallentaa toiveet tiedostoon"""
 
     print("Aloitetaan toiveiden tallentaminen tiedostoon")
 
     try:
         file = open(WISHFILE, "w")
-    except:
+    except Exception:
         print("Tiedoston lukeminen epaonnistui")
         return
 
@@ -106,7 +112,8 @@ def tallennaToiveTiedosto(wishes):
 
     return
 
-def luoTiedostot(data):
+def luo_tiedostot(data):
+	"""Luo arvoituista tiedoista henkilökohtaiset tiedostot"""
 
     print("Tehdaan ykisttaiset tiedostot")
     laskin = 0
@@ -114,7 +121,7 @@ def luoTiedostot(data):
         tnimi = TNIMIVAKIO + str(randint(1000, 10000)) + "-" + nimi.lower()
         try:
             file = open(tnimi, "w")
-        except:
+        except Exception:
             print("Tiedoston avaaminen epaonnistui,", laskin, "nimea tallenenttu")
             return data
         file.write(nimi + "\nSinulle on arvottu\n" + data[nimi][0])
@@ -123,7 +130,8 @@ def luoTiedostot(data):
     print(laskin, "tiedostoa tehty onnistuneesti")
 
 
-def syotaTietoja(data, arvottu, wishes):
+def syota_tietoja(data, arvottu, wishes):
+	"""Lisää uusia henkilöitä"""
 
     if not arvottu:
         nimi = input("Syota henkilon nimi: ")
@@ -147,8 +155,10 @@ def syotaTietoja(data, arvottu, wishes):
     arvottu = False
     return data, arvottu, wishes
 
-def suoritaArvonta(data):
-    tallennaTiedosto(data, False)
+def suorita_arvonta(data):
+	"""Arpoo secret santat kaikille"""
+
+    tallenna_tiedosto(data, False)
     lista = sorted(data)
     for nimi in data:
         data[nimi].pop(0)
@@ -182,7 +192,8 @@ def suoritaArvonta(data):
 
     return data, True
 
-def tarkistaTiedot(data, arvottu):
+def tarkista_tiedot(data, arvottu):
+	"""Tarkistaa secret santojen toimivuuden"""
 
     if not arvottu:
         print("Tietoja ei ole viela arvottu")
@@ -231,17 +242,26 @@ def tarkistaTiedot(data, arvottu):
     return
 
 def main():
+	"""Päävalikko"""
+
     data = {}
     wishes = {}
     arvottu = False
+	jatka = True
+	
     for i in range(0, 60):
         print()
-    teksti = "Tervetuloa secret santa arvontaohjelmaan. Alla muutama kayttoa helpottava ohje: Jos sinulla on jo käytössä tiedostoja kuten toive tai data, lataa se ennen kuin lisäät lietoja, muuten ne ylikirjoitetaan. Nimiketietoja pystyy muokkaamaan lisämmällä samannimisen henkilön uudestaan oikeilla tiedoilla. Poistaminen ja laajempi muokkaus kannattaa tehdä suoraan teidostoa muokaten. Arvontaa ennen tapahtuu automaattinen tallennus."
-    for i in teksti:
+    teksti = "Tervetuloa secret santa arvontaohjelmaan. Alla muutama kayttoa helpottava ohje: Jos"+
+	"sinulla on jo käytössä tiedostoja kuten toive tai data, lataa se ennen kuin lisäät lietoja, "+
+	"muuten ne ylikirjoitetaan. Nimiketietoja pystyy muokkaamaan lisämmällä samannimisen henkilön"+
+	"uudestaan oikeilla tiedoilla. Poistaminen ja laajempi muokkaus kannattaa tehdä suoraan teido"+
+	"stoa muokaten. Arvontaa ennen tapahtuu automaattinen tallennus."
+
+	for i in teksti:
         print(i, end="")
         #time.sleep(0.1) #Ei toimi chromebookissa
 
-    while True:
+    while jatka:
         print()
         input("Paina jatkaaksesi...")
         for i in range(0, 60):
@@ -267,36 +287,36 @@ def main():
 
         try:
             userInput = int(input("Mita haluat tehda: "))
-        except:
+        except Exception:
             print("Vaara arvo")
             continue
 
-        for i in range(0,60):
+        for i in range(0, 60):
             print()
 
         if userInput == 0:
             print("Kiitos ja hei")
-            return 0
+            jatka = False
         elif userInput == 1:
-            data, arvottu, wishes = syotaTietoja(data, arvottu, wishes)
+            data, arvottu, wishes = syota_tietoja(data, arvottu, wishes)
         elif userInput == 2:
-            tallennaTiedosto(data, arvottu)
+            tallenna_tiedosto(data, arvottu)
         elif userInput == 3:
-            data, arvottu = lueTiedosto(data)
+            data, arvottu = lue_tiedosto(data)
         elif userInput == 4:
-            data, arvottu = suoritaArvonta(data)
+            data, arvottu = suorita_arvonta(data)
         elif userInput == 5:
-            luoTiedostot(data)
+            luo_tiedostot(data)
         elif userInput == 6:
-            tarkistaTiedot(data, arvottu)
+            tarkista_tiedot(data, arvottu)
         elif userInput == 7:
-            wishes = lueToiveTiedosto(wishes)
+            wishes = lue_toive_tiedosto(wishes)
         elif userInput == 8:
-            tallennaToiveTiedosto(wishes)
+            tallenna_toive_tiedosto(wishes)
         else:
             print("Vaara arvo")
 
-
+	return 0
 
 
 main()
