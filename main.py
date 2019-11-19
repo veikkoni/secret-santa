@@ -1,12 +1,17 @@
 from random import randint
+import time
+
+DATAFILE = "data.txt"
+WISHFILE = "wishes.txt"
+TNIMIVAKIO = "4" #Tuotettavien tiedostojen etuliite
 
 def lueTiedosto(data):
     print("Aloitetaan tiedostosta lukeminen")
     try:
-        file = open("data.txt", "r")
+        file = open(DATAFILE, "r")
     except:
         print("Tiedoston lukeminen epaonnistui")
-        return data
+        return data, False
     next(file)
     laskuri = 0
     for rivi in file:
@@ -29,7 +34,27 @@ def lueTiedosto(data):
             arvottu = False
     
     return data, arvottu
-                
+
+
+def lueToiveTiedosto(wishes):
+    print("Aloitetaan toiveiden lukeminen tiedostosta")
+    try:
+        file = open(WISHFILE, "r")
+    except:
+        print("Tiedoston lukeminen epaonnistui")
+        return wishes
+    next(file)
+    laskuri = 0
+    for rivi in file:
+        laskuri += 1
+        rivi = rivi[:-1]
+        sanat = rivi.split(";")
+        wishes[str(sanat[0])] = str(sanat[1])
+
+    print(laskuri, "toivetta haettu tiedostosta")
+    file.close()
+    
+    return wishes
     
     
 def tallennaTiedosto(data, arvottu):
@@ -37,13 +62,13 @@ def tallennaTiedosto(data, arvottu):
     print("Aloitetaan tiedostoon tallentaminen")
 
     try:
-        file = open("data.txt", "w")
+        file = open(DATAFILE, "w")
     except:
         print("Tiedoston lukeminen epaonnistui")
         return data
     
     file.write("Tama on secret santan datatiedosto. ")
-    file.write("Data on muotoa Nimi, kohde, kiellot\n")
+    file.write("Data on muotoa nimi;kohde;kiellot\n")
     laskuri = 0
     for nimi in sorted(data):
         laskuri += 1
@@ -58,12 +83,35 @@ def tallennaTiedosto(data, arvottu):
     
     return data
 
+def tallennaToiveTiedosto(wishes):
+    
+    print("Aloitetaan toiveiden tallentaminen tiedostoon")
+
+    try:
+        file = open(WISHFILE, "w")
+    except:
+        print("Tiedoston lukeminen epaonnistui")
+        return
+    
+    file.write("Tama on secret santan toivetiedosto. ")
+    file.write("Data on muotoa nimi;toive\n")
+    laskuri = 0
+    for nimi in sorted(wishes):
+        laskuri += 1
+        teksti = nimi + ";" + wishes[nimi] + "\n"
+        file.write(teksti)
+
+    file.close()    
+    print(laskuri, "toivetta tallennettu tiedostoon")
+    
+    return
+
 def luoTiedostot(data):
     
     print("Tehdaan ykisttaiset tiedostot")
     laskin = 0
     for nimi in data:
-        tnimi = "5"+ str(randint(1000, 10000)) + "-" + nimi.lower()
+        tnimi = TNIMIVAKIO + str(randint(1000, 10000)) + "-" + nimi.lower()
         try:
             file = open(tnimi, "w")
         except:
@@ -74,14 +122,17 @@ def luoTiedostot(data):
         laskin += 1
     print(laskin, "tiedostoa tehty onnistuneesti")
         
-def syotaTietoja(data, arvottu):
+def syotaTietoja(data, arvottu, wishes):
     
     if not arvottu:
         nimi = input("Syota henkilon nimi: ")
+        wish = input("Syöta henkilon toive (Jätä tyhjäksi käyttääksesi tiedoston toivetta): ")
+        if (wish != ""):
+            wishes[nimi] = wish
         data[nimi] = [None]
         syote = " "
         while syote != "":
-            syote = input("Syota henkilon kielletyt henkilot: ")
+            syote = input("Syota henkilon kielletyt henkilot (Paina enter kun valmis): ")
             if syote != "":
                 data[nimi].append(syote)
     else:
@@ -93,7 +144,7 @@ def syotaTietoja(data, arvottu):
             data[nimi] = []
             
     arvottu = False
-    return data, arvottu
+    return data, arvottu, wishes
 
 def suoritaArvonta(data):
     tallennaTiedosto(data, False)
@@ -182,8 +233,15 @@ def tarkistaTiedot(data, arvottu):
 
 def main():
     data = {}
+    wishes = {}
     arvottu = False
-    
+    for i in range(0,60):
+        print()
+    teksti = "Tervetuloa secret santa arvontaohjelmaan. Alla muutama kayttoa helpottava ohje: Jos sinulla on jo käytössä tiedostoja kuten toive tai data, lataa se ennen kuin lisäät lietoja, muuten ne ylikirjoitetaan. Nimiketietoja pystyy muokkaamaan lisämmällä samannimisen henkilön uudestaan oikeilla tiedoilla. Poistaminen ja laajempi muokkaus kannattaa tehdä suoraan teidostoa muokaten. Arvontaa ennen tapahtuu automaattinen tallennus."
+    for i in teksti:
+        print(i, end="")
+        #time.sleep(0.1) #Ei toimi chromebookissa
+
     while True:
         print()
         input("Paina jatkaaksesi...")
@@ -196,11 +254,16 @@ def main():
         print("4 Arvo parit")
         print("5 Luo nimelliset tiedostot")
         print("6 Tarkista arvot")
+        print("7 Lue toiveet tiedostosta")
+        print("8 Tallenna toiveet tiedostoon")
+        print()
         print("Ladattuna", len(data), "nimiketietoa")
         if arvottu:
             print("Parit on jo arvottu")
         else:
             print("Pareja ei ole viela arvottu")
+
+        print("Ladattuna", len(wishes), "toivetta")
         print()
     
         try:
@@ -216,7 +279,7 @@ def main():
             print("Kiitos ja hei")
             return 0
         elif userInput == 1:
-            data, arvottu = syotaTietoja(data, arvottu)
+            data, arvottu, wishes = syotaTietoja(data, arvottu, wishes)
         elif userInput == 2:
             tallennaTiedosto(data, arvottu)
         elif userInput == 3:
@@ -227,6 +290,10 @@ def main():
             luoTiedostot(data)
         elif userInput == 6:
             tarkistaTiedot(data, arvottu)
+        elif userInput == 7:
+            wishes = lueToiveTiedosto(wishes)
+        elif userInput == 8:
+            tallennaToiveTiedosto(wishes)
         else:
             print("Vaara arvo")
     
