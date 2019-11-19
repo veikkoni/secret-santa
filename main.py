@@ -1,12 +1,24 @@
+"""
+Secret santa arpomis sovellus
+Veikko Nieminen
+"""
 from random import randint
+import time
 
-def lueTiedosto(data):
+TIME = 0.01
+DATAFILE = "data.txt"
+WISHFILE = "wishes.txt"
+TNIMIVAKIO = "4" #Tuotettavien tiedostojen etuliite
+
+def lue_tiedosto(data):
+    """Lukee datan tiedostosta"""
+
     print("Aloitetaan tiedostosta lukeminen")
     try:
-        file = open("data.txt", "r")
-    except:
+        file = open(DATAFILE, "r")
+    except Exception:
         print("Tiedoston lukeminen epaonnistui")
-        return data
+        return data, False
     next(file)
     laskuri = 0
     for rivi in file:
@@ -21,29 +33,52 @@ def lueTiedosto(data):
 
     print(laskuri, "nimiketietoa haettu tiedostosta")
     file.close()
-    
+
     arvottu = True
-    
+
     for nimi in data:
         if data[nimi][0] == "None":
             arvottu = False
-    
+
     return data, arvottu
-                
-    
-    
-def tallennaTiedosto(data, arvottu):
-    
+
+
+def lue_toive_tiedosto(wishes):
+    """Lukee toiveet tiedostosta"""
+
+    print("Aloitetaan toiveiden lukeminen tiedostosta")
+    try:
+        file = open(WISHFILE, "r")
+    except Exception:
+        print("Tiedoston lukeminen epaonnistui")
+        return wishes
+    next(file)
+    laskuri = 0
+    for rivi in file:
+        laskuri += 1
+        rivi = rivi[:-1]
+        sanat = rivi.split(";")
+        wishes[str(sanat[0])] = str(sanat[1])
+
+    print(laskuri, "toivetta haettu tiedostosta")
+    file.close()
+
+    return wishes
+
+
+def tallenna_tiedosto(data, arvottu):
+    """Talentaa datan tiedostoon"""
+
     print("Aloitetaan tiedostoon tallentaminen")
 
     try:
-        file = open("data.txt", "w")
-    except:
+        file = open(DATAFILE, "w")
+    except Exception:
         print("Tiedoston lukeminen epaonnistui")
         return data
-    
+
     file.write("Tama on secret santan datatiedosto. ")
-    file.write("Data on muotoa Nimi, kohde, kiellot\n")
+    file.write("Data on muotoa nimi;kohde;kiellot\n")
     laskuri = 0
     for nimi in sorted(data):
         laskuri += 1
@@ -53,35 +88,65 @@ def tallennaTiedosto(data, arvottu):
         teksti += "\n"
         file.write(teksti)
 
-    file.close()    
+    file.close()
     print(laskuri, "nimiketietoa tallennettu tiedostoon")
-    
+
     return data
 
-def luoTiedostot(data):
-    
+def tallenna_toive_tiedosto(wishes):
+    """Tallentaa toiveet tiedostoon"""
+
+    print("Aloitetaan toiveiden tallentaminen tiedostoon")
+
+    try:
+        file = open(WISHFILE, "w")
+    except Exception:
+        print("Tiedoston lukeminen epaonnistui")
+        return
+
+    file.write("Tama on secret santan toivetiedosto. ")
+    file.write("Data on muotoa nimi;toive\n")
+    laskuri = 0
+    for nimi in sorted(wishes):
+        laskuri += 1
+        teksti = nimi + ";" + wishes[nimi] + "\n"
+        file.write(teksti)
+
+    file.close()
+    print(laskuri, "toivetta tallennettu tiedostoon")
+
+    return
+
+def luo_tiedostot(data):
+    """Luo arvoituista tiedoista henkilökohtaiset tiedostot"""
+
     print("Tehdaan ykisttaiset tiedostot")
     laskin = 0
     for nimi in data:
-        tnimi = "5"+ str(randint(1000, 10000)) + "-" + nimi.lower()
+        tnimi = TNIMIVAKIO + str(randint(1000, 10000)) + "-" + nimi.lower()
         try:
             file = open(tnimi, "w")
-        except:
+        except Exception:
             print("Tiedoston avaaminen epaonnistui,", laskin, "nimea tallenenttu")
             return data
-        file.write(nimi + "\nSinulle on arvottu\n" + data[nimi][0]) 
+        file.write(nimi + "\nSinulle on arvottu\n" + data[nimi][0])
         file.close()
         laskin += 1
     print(laskin, "tiedostoa tehty onnistuneesti")
-        
-def syotaTietoja(data, arvottu):
-    
+
+
+def syota_tietoja(data, arvottu, wishes):
+    """Lisää uusia henkilöitä"""
+
     if not arvottu:
         nimi = input("Syota henkilon nimi: ")
+        wish = input("Syöta henkilon toive (Jätä tyhjäksi käyttääksesi tiedoston toivetta): ")
+        if wish != "":
+            wishes[nimi] = wish
         data[nimi] = [None]
         syote = " "
         while syote != "":
-            syote = input("Syota henkilon kielletyt henkilot: ")
+            syote = input("Syota henkilon kielletyt henkilot (Paina enter kun valmis): ")
             if syote != "":
                 data[nimi].append(syote)
     else:
@@ -91,19 +156,21 @@ def syotaTietoja(data, arvottu):
         if int(input("Syote: ")) == 1:
             nimi = input("Syota henkilon nimi: ")
             data[nimi] = []
-            
-    arvottu = False
-    return data, arvottu
 
-def suoritaArvonta(data):
-    tallennaTiedosto(data, False)
+    arvottu = False
+    return data, arvottu, wishes
+
+def suorita_arvonta(data):
+    """Arpoo secret santat kaikille"""
+
+    tallenna_tiedosto(data, False)
     lista = sorted(data)
     for nimi in data:
         data[nimi].pop(0)
         pahatNimet = []
         for pahaNimi in data[nimi]:
             pahatNimet.append(pahaNimi)
-        data[nimi].insert(0, "None")        
+        data[nimi].insert(0, "None")
         ongelmat = 0
         jatka = True
         kiellettu = False
@@ -111,13 +178,13 @@ def suoritaArvonta(data):
             if ongelmat >= 30:
                 print("Arvonta epaonnistui")
                 return data, False
-            x = randint(0,len(lista)-1)
+            x = randint(0, len(lista)-1)
             arvottuNimi = lista[x]
             if arvottuNimi != nimi:
                 for kielletty in pahatNimet:
                     if arvottuNimi == kielletty:
                         kiellettu = True
-                        
+
                 if not kiellettu:
                     lista.pop(x)
                     data[nimi].pop(0)
@@ -127,19 +194,19 @@ def suoritaArvonta(data):
 
     if ongelmat < 30:
         print("Arvonta suoritettu onnistuneesti")
-                    
+
     return data, True
 
-def tarkistaTiedot(data, arvottu):
-    
-    
+def tarkista_tiedot(data, arvottu):
+    """Tarkistaa secret santojen toimivuuden"""
+
     if not arvottu:
         print("Tietoja ei ole viela arvottu")
         return
-    
+
     ongelmia = 0
     lista = sorted(data)
-    
+
     for nimi in sorted(data):
         for nimi2 in data[nimi]:
             if nimi2 not in lista:
@@ -149,7 +216,6 @@ def tarkistaTiedot(data, arvottu):
     if ongelmia > 0:
         print("Yhteensa", ongelmia, "kielloista on turhia")
 
-    
     for nimi in sorted(data):
         kielletty = data[nimi][0]
         lista = data[nimi].copy()
@@ -172,22 +238,40 @@ def tarkistaTiedot(data, arvottu):
     else:
         ongelmia += 1
         print("ONGELMA: Arvotut ei sama kuin osallistuja")
-        
+
     if len(lista) != len(lista2):
         ongelmia += 1
         print("ONGELMA: Arvotut ei tasmaa osallistujia")
 
     print("Kohdattiin", ongelmia, "ongelmaa")
-    return        
+    return
 
 def main():
+    """Päävalikko"""
+
     data = {}
+    wishes = {}
     arvottu = False
-    
-    while True:
+    jatka = True
+
+    for i in range(0, 60):
+        print()
+
+    teksti = "Tervetuloa secret santa arvontaohjelmaan. Alla muutama kayttoa helpottava ohje: Jos"+\
+    "sinulla on jo käytössä tiedostoja kuten toive tai data, lataa se ennen kuin lisäät lietoja, "+\
+    "muuten ne ylikirjoitetaan. Nimiketietoja pystyy muokkaamaan lisämmällä samannimisen henkilön"+\
+    "uudestaan oikeilla tiedoilla. Poistaminen ja laajempi muokkaus kannattaa tehdä suoraan teido"+\
+    "stoa muokaten. Arvontaa ennen tapahtuu automaattinen tallennus."
+
+    for i in range(len(teksti)):
+        print(teksti[i], end="", flush=True)
+        time.sleep(TIME) #Ei toimi chromebookissa
+    print()
+
+    while jatka:
         print()
         input("Paina jatkaaksesi...")
-        for i in range(0,60):
+        for i in range(0, 60):
             print()
         print("0 Lopeta ohjelma")
         print("1 Syota tietoja")
@@ -196,43 +280,50 @@ def main():
         print("4 Arvo parit")
         print("5 Luo nimelliset tiedostot")
         print("6 Tarkista arvot")
+        print("7 Lue toiveet tiedostosta")
+        print("8 Tallenna toiveet tiedostoon")
+        print()
         print("Ladattuna", len(data), "nimiketietoa")
         if arvottu:
             print("Parit on jo arvottu")
         else:
             print("Pareja ei ole viela arvottu")
+
+        print("Ladattuna", len(wishes), "toivetta")
         print()
-    
+
         try:
             userInput = int(input("Mita haluat tehda: "))
-        except:
+        except Exception:
             print("Vaara arvo")
             continue
 
-        for i in range(0,60):
+        for i in range(0, 60):
             print()
 
         if userInput == 0:
             print("Kiitos ja hei")
-            return 0
+            jatka = False
         elif userInput == 1:
-            data, arvottu = syotaTietoja(data, arvottu)
+            data, arvottu, wishes = syota_tietoja(data, arvottu, wishes)
         elif userInput == 2:
-            tallennaTiedosto(data, arvottu)
+            tallenna_tiedosto(data, arvottu)
         elif userInput == 3:
-            data, arvottu = lueTiedosto(data)
+            data, arvottu = lue_tiedosto(data)
         elif userInput == 4:
-            data, arvottu = suoritaArvonta(data)
+            data, arvottu = suorita_arvonta(data)
         elif userInput == 5:
-            luoTiedostot(data)
+            luo_tiedostot(data)
         elif userInput == 6:
-            tarkistaTiedot(data, arvottu)
+            tarkista_tiedot(data, arvottu)
+        elif userInput == 7:
+            wishes = lue_toive_tiedosto(wishes)
+        elif userInput == 8:
+            tallenna_toive_tiedosto(wishes)
         else:
             print("Vaara arvo")
-    
 
-
-
+    return 0
 
 
 main()
