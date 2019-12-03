@@ -12,3 +12,17 @@ test:pylint:
     artifacts:
         paths:
             - ./pylint/
+test:sonar:
+   image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+   variables:
+    SONAR_TOKEN: "530126e3ff58e26b71f33eaf91754eeb5bdf9059"
+    SONAR_HOST_URL: "http://hoodienkuninkaat.com:9000"
+   sonarqube-check:
+    stage: test
+    script:
+       - sonar-scanner
+    only:
+       - merge_requests
+       - branches
