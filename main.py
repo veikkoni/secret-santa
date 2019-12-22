@@ -1,5 +1,6 @@
 """
-Secret santa arpomis sovellus
+Hyvin yksinkertainen secret santa arpomis sovellus. Ideana on luoda pieni sivu
+jokaiselle henkilölle jolloin edes arpoja ei tiedä ketä kukin saa.
 Veikko Nieminen
 """
 from random import randint
