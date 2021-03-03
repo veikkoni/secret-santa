@@ -1,6 +1,5 @@
 """
-Hyvin yksinkertainen secret santa arpomis sovellus. Ideana on luoda pieni sivu
-jokaiselle henkilölle jolloin edes arpoja ei tiedä ketä kukin saa.
+Secret santa arpomis sovellus
 Veikko Nieminen
 """
 from random import randint
@@ -9,7 +8,12 @@ import time
 TIME = 0.01
 DATAFILE = "data.txt"
 WISHFILE = "wishes.txt"
-TNIMIVAKIO = "4" #Tuotettavien tiedostojen etuliite
+TNIMIVAKIO = "5" #Tuotettavien tiedostojen etuliite
+STRING1 = '<meta name="viewport" content="width=device-width, initial-scale=1.0; user-scalable=no"><body style="margin: 0px;"><div style="background-image: url(\'https://i.imgur.com/vZkXw9l.jpg\'); height:100%; width:100%; background-size:cover; margin-top: 0px;""><div style="width: 100%; height: 100%; padding-top: 30%; padding-left:20%;"><div style="border: 2px solid black; padding: 15px; width:45%; min-width: 200px; overflow-wrap: break-word; font-family: Arial, Helvetica, sans-serif; border-radius: 10px; background-color: #ffffff; max-width: 300px; font-size: 14px"><center>Hei <B>'
+STRING2 = '</B>!<br><br>Sinulle on arvottu<br><B>'
+STRING3 = '</B><br><br>Hänen toiveensa:<br>"'
+STRING4 = '"<br><br>Ei toivottua:<br>"'
+STRING5 = '"<br><img src="https://i.imgur.com/mhNXPHL.png" height="180vi" width="180vi"><br>Budjetti ~20€</center></div></div></div></body>'
 
 def lue_tiedosto(data):
     """Lukee datan tiedostosta"""
@@ -118,19 +122,24 @@ def tallenna_toive_tiedosto(wishes):
 
     return
 
-def luo_tiedostot(data):
+def luo_tiedostot(data, wishes):
     """Luo arvoituista tiedoista henkilökohtaiset tiedostot"""
 
     print("Tehdaan ykisttaiset tiedostot")
     laskin = 0
     for nimi in data:
-        tnimi = TNIMIVAKIO + str(randint(1000, 10000)) + "-" + nimi.lower()
+        tnimi = TNIMIVAKIO + str(randint(1000, 10000)) + "-" + nimi.lower()+".html"
         try:
             file = open(tnimi, "w")
         except Exception:
             print("Tiedoston avaaminen epaonnistui,", laskin, "nimea tallenenttu")
             return data
-        file.write(nimi + "\nSinulle on arvottu\n" + data[nimi][0])
+        toive, epatoive = wishes[data[nimi][0]].split("/")
+        if toive == "Empty":
+            toive = ""
+        if epatoive == "Empty":
+            epatoive = ""
+        file.write(STRING1 + nimi + STRING2 + data[nimi][0] + STRING3 + toive + STRING4 + epatoive + STRING5)
         file.close()
         laskin += 1
     print(laskin, "tiedostoa tehty onnistuneesti")
@@ -164,20 +173,20 @@ def syota_tietoja(data, arvottu, wishes):
 def suorita_arvonta(data):
     """Arpoo secret santat kaikille"""
 
-    tallenna_tiedosto(data, False)
+   # tallenna_tiedosto(data, False)
     lista = sorted(data)
+    ongelmat = 0
     for nimi in data:
         data[nimi].pop(0)
         pahatNimet = []
         for pahaNimi in data[nimi]:
             pahatNimet.append(pahaNimi)
         data[nimi].insert(0, "None")
-        ongelmat = 0
         jatka = True
         kiellettu = False
         while jatka is True:
             if ongelmat >= 30:
-                print("Arvonta epaonnistui")
+        #        print("Arvonta epaonnistui")
                 return data, False
             x = randint(0, len(lista)-1)
             arvottuNimi = lista[x]
@@ -193,17 +202,17 @@ def suorita_arvonta(data):
                     jatka = False
             ongelmat += 1
 
-    if ongelmat < 30:
-        print("Arvonta suoritettu onnistuneesti")
+    #if ongelmat < 30:
+   #     print("Arvonta suoritettu onnistuneesti")
 
     return data, True
 
 def tarkista_tiedot(data, arvottu):
     """Tarkistaa secret santojen toimivuuden"""
 
-    if not arvottu:
-        print("Tietoja ei ole viela arvottu")
-        return
+#    if not arvottu:
+#        print("Tietoja ei ole viela arvottu")
+#        return
 
     ongelmia = 0
     lista = sorted(data)
@@ -247,6 +256,19 @@ def tarkista_tiedot(data, arvottu):
     print("Kohdattiin", ongelmia, "ongelmaa")
     return
 
+def arvonta_wrapped(data):
+    rounds = 0
+    while rounds <= 1000:
+        users, arvottu = suorita_arvonta(data)
+        if arvottu == True:
+            print("Arvonta onnistui")
+            return users, arvottu
+        else:
+            rounds += 1
+    print("Arvonta ei onnistunut")        
+    return data, False
+
+
 def main():
     """Päävalikko"""
 
@@ -264,9 +286,9 @@ def main():
     "uudestaan oikeilla tiedoilla. Poistaminen ja laajempi muokkaus kannattaa tehdä suoraan teido"+\
     "stoa muokaten. Arvontaa ennen tapahtuu automaattinen tallennus."
 
-    for i in range(len(teksti)):
-        print(teksti[i], end="", flush=True)
-        time.sleep(TIME) #Ei toimi chromebookissa
+    #for i in range(len(teksti)):
+   #     print(teksti[i], end="", flush=True)
+    #    time.sleep(TIME) #Ei toimi chromebookissa
     print()
 
     while jatka:
@@ -312,9 +334,9 @@ def main():
         elif userInput == 3:
             data, arvottu = lue_tiedosto(data)
         elif userInput == 4:
-            data, arvottu = suorita_arvonta(data)
+            data, arvottu = arvonta_wrapped(data)
         elif userInput == 5:
-            luo_tiedostot(data)
+            luo_tiedostot(data, wishes)
         elif userInput == 6:
             tarkista_tiedot(data, arvottu)
         elif userInput == 7:
